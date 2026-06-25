@@ -1,0 +1,216 @@
+/* ── Topbar style identique à l'État Civil ───────────────────────────── */
+.topbar { 
+  background: white;
+  padding: 0 1.5rem; 
+  height: 65px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-bottom: 4px solid transparent;
+  border-image: linear-gradient(90deg, #F77F00 33%, white 33%, white 66%, #009A44 66%) 1;
+}
+
+.tb-title { 
+  color: #003366; 
+  font-size: 19px; 
+  font-weight: 800; 
+}
+
+.tb-sub { 
+  color: #6c757d; 
+  font-size: 11px; 
+  font-weight: 600; 
+  text-transform: uppercase; 
+}
+
+.tb-user { 
+  color: #003366; 
+  font-size: 13px; 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  background: #f4f6f9;
+  padding: 6px 16px;
+  border-radius: 30px; 
+}
+
+.av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F77F00, #009A44);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}
+
+.tb-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color .15s, background .15s;
+}
+.tb-logout:hover { color: #991b1b; background: #fee2e2; }
+
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.layout { display: flex; }
+
+/* ── Sidebar style identique à l'État Civil ─────────────────────────── */
+.sidebar { 
+  width: 240px; 
+  background: linear-gradient(180deg, #003366 0%, #001f3f 100%);
+  min-height: calc(100vh - 65px); 
+  padding: 24px 0; 
+}
+
+.sb-sec { 
+  font-size: 11px; 
+  color: #8daac7; 
+  padding: 12px 20px 8px; 
+  text-transform: uppercase; 
+  font-weight: 700; 
+}
+
+.sb-it { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 11px 20px; 
+  margin: 4px 12px;
+  border-radius: 8px;
+  color: #cbdcf0; 
+  font-size: 13.5px; 
+  font-weight: 500;
+  cursor: pointer; 
+  transition: all 0.25s; 
+}
+
+.sb-it i { 
+  font-size: 18px; 
+  width: 24px; 
+  text-align: center; 
+}
+
+.sb-it:hover { 
+  background: rgba(255,255,255,0.07); 
+  color: white; 
+  transform: translateX(4px);
+}
+
+.sb-it.act { 
+  background: linear-gradient(90deg, #F77F00 0%, #e06d00 100%);
+  color: white; 
+  font-weight: 600; 
+}
+
+/* ── Main content ────────────────────────────────────────────────────── */
+.main { 
+  flex: 1; 
+  padding: 1.5rem; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.5rem; 
+  min-width: 0; 
+  background: linear-gradient(135deg, #f8f9fa 0%, #eef1f6 100%);
+}
+
+/* ── Header KPIs ─────────────────────────────────────────────────────── */
+.hdr { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  flex-wrap: wrap; 
+  gap: 1rem; 
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.hl { 
+  display: flex; 
+  align-items: center; 
+  gap: 1rem; 
+}
+
+.hi { 
+  font-size: 28px; 
+  color: #F77F00; 
+  background: rgba(247,127,0,0.1);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.hdr h2 { 
+  font-size: 16px; 
+  font-weight: 700; 
+  color: #003366; 
+  margin: 0; 
+}
+
+.hdr p { 
+  font-size: 12px; 
+  color: #6c757d; 
+  margin: 4px 0 0; 
+}
+
+.mkpis { 
+  display: flex; 
+  gap: 1rem; 
+  flex-wrap: wrap; 
+}
+
+.mk { 
+  text-align: center; 
+  min-width: 80px; 
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.mk-v { 
+  display: block; 
+  font-size: 20px; 
+  font-weight: 700; 
+}
+
+.mk-l { 
+  display: block; 
+  font-size: 10px; 
+  color: #6c757d; 
+  text-transform: uppercase; 
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar { 
+    width: 200px; 
+  }
+  
+  .main { 
+    padding: 1rem; 
+  }
+  
+  .hdr { 
+    flex-direction: column; 
+    align-items: flex-start; 
+  }
+  
+  .mkpis { 
+    width: 100%; 
+    justify-content: space-between; 
+  }
+}
