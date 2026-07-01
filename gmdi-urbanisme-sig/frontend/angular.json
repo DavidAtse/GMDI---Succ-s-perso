@@ -11,7 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": { "outputPath": "dist/gmdi-urbanisme", "index": "src/index.html", "browser": "src/main.ts", "polyfills": ["zone.js"], "tsConfig": "tsconfig.app.json", "assets": [{"glob":"**/*","input":"public"}], "styles": ["src/styles.css"], "scripts": [] },
-          "configurations": { "production": { "outputHashing": "all" }, "development": { "optimization": false, "sourceMap": true } },
+          "configurations": { "production": { "outputHashing": "all", "fileReplacements": [{ "replace": "src/environments/environment.ts", "with": "src/environments/environment.production.ts" }] }, "development": { "optimization": false, "sourceMap": true } },
           "defaultConfiguration": "production"
         },
         "serve": {

@@ -67,8 +67,27 @@ import { LoadingService } from '../../core/services/loading.service';
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(160deg, #002244 0%, #003366 60%, #004488 100%);
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      background:
+        linear-gradient(160deg, #D96B00 0%, #F77F00 35%, #006B30 100%);
+      font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent 0px, transparent 30px, rgba(255,255,255,.04) 30px, rgba(255,255,255,.04) 31px),
+        repeating-linear-gradient(0deg, transparent 0px, transparent 30px, rgba(255,255,255,.04) 30px, rgba(255,255,255,.04) 31px);
+      pointer-events: none;
+    }
+    .login-container::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #F77F00 33.33%, #fff 33.33%, #fff 66.66%, #009A44 66.66%);
     }
 
     .login-card {
@@ -76,9 +95,12 @@ import { LoadingService } from '../../core/services/loading.service';
       border-radius: 20px;
       padding: 2rem;
       width: 380px;
-      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(0, 0, 0, 0.05);
+      border-top: 4px solid #F77F00;
       transition: transform 0.2s ease;
+      position: relative;
+      z-index: 1;
     }
 
     .login-card:hover {
@@ -113,7 +135,7 @@ import { LoadingService } from '../../core/services/loading.service';
     }
 
     .login-title h2 {
-      color: #003366;
+      color: #004D20;
       font-size: 20px;
       font-weight: 700;
       margin: 0 0 5px 0;
@@ -159,7 +181,7 @@ import { LoadingService } from '../../core/services/loading.service';
     .fl {
       font-size: 12px;
       font-weight: 600;
-      color: #003366;
+      color: #004D20;
     }
 
     .fi {

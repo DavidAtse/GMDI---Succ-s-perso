@@ -1,1 +1,1 @@
-export const environment = { production: true, apiUrl: "https://gmdi.mairie.ci/api" };
+export const environment = { production: true, apiUrl: "/gmdi-api-urb/api" };

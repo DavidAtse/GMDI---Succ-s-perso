@@ -103,7 +103,6 @@ type Tab = 'photos' | 'videos' | 'archives';
 @if (active()==='archives') {
   <div class="ph">
     <div class="pt"><i class="ti ti-archive"></i>Archives documentaires</div>
-    <button class="btn-s"><i class="ti ti-search"></i>Recherche avancée</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">1 248</span><span class="mk-l">Documents archivés</span></div>
@@ -118,7 +117,7 @@ type Tab = 'photos' | 'videos' | 'archives';
     </select>
   </div>
   <div style="padding:.75rem 1rem">
-    @for (d of com.documents(); track d.id) {
+    @for (d of filteredDocuments(); track d.id) {
       <div class="doc-card">
         <div class="doc-ico" [style.background]="docColor(d.type)+'1a'" [style.color]="docColor(d.type)"><i class="ti {{docIcon(d.type)}}"></i></div>
         <div class="doc-body">
@@ -155,6 +154,13 @@ export class DocumentsComponent implements OnInit {
 
   photos  = () => this.com.documents().filter(d => d.type === 'photo');
   videos  = () => this.com.documents().filter(d => d.type === 'video');
+
+  filteredDocuments() {
+    const q = this.searchArc.toLowerCase().trim();
+    return this.com.documents().filter(d =>
+      !q || d.titre.toLowerCase().includes(q) || (d.categorie ?? '').toLowerCase().includes(q)
+    );
+  }
 
   tabs = [
     { id: 'photos' as Tab,   label: 'Photos',   icon: 'ti-photo' },

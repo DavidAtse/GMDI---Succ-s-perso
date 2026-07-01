@@ -23,11 +23,14 @@ interface NavItem { id: Section; label: string; icon: string; }
   ],
   template: `
 <div class="root">
-  <!-- Topbar style État Civil -->
+  <!-- Topbar CI -->
   <div class="topbar">
-    <div>
-      <div class="tb-title">GMDI — Module Ressources Humaines</div>
-      <div class="tb-sub">République de Côte d'Ivoire</div>
+    <div class="tb-brand">
+      <div class="tb-flag"><span></span><span></span><span></span></div>
+      <div>
+        <div class="tb-title">GMDI — Ressources Humaines</div>
+        <div class="tb-sub">République de Côte d'Ivoire</div>
+      </div>
     </div>
     <div class="tb-user">
       <div class="av">{{ initiales() }}</div>

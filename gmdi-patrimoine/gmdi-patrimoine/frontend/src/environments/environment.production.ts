@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://gmdi.mairie.ci/api',
+  apiUrl: '/gmdi-api-pat/api',
 };

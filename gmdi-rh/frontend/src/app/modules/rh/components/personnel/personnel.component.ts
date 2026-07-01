@@ -127,6 +127,25 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
           </select>
         </div>
       </div>
+
+      <div class="fs">Pièces justificatives</div>
+      <div class="fr3">
+        <div class="fg">
+          <div class="fl">Numéro CNI <span class="req">*</span></div>
+          <input class="fi" [(ngModel)]="form.numeroCNI" placeholder="Ex: CI0123456789">
+        </div>
+        <div class="fg">
+          <div class="fl">Copie CNI / Passeport</div>
+          <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniSelected($event)">
+          @if (fileCNI) { <span class="file-ok"><i class="ti ti-circle-check"></i>{{ fileCNI.name }}</span> }
+        </div>
+        <div class="fg">
+          <div class="fl">Diplôme (scan PDF)</div>
+          <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onDiplomeSelected($event)">
+          @if (fileDiplome) { <span class="file-ok"><i class="ti ti-circle-check"></i>{{ fileDiplome.name }}</span> }
+        </div>
+      </div>
+
       <div class="fa">
         <button class="bs" (click)="resetFiche()"><i class="ti ti-x"></i>Effacer</button>
         <button class="bp" (click)="creerAgent()"><i class="ti ti-check"></i>Enregistrer la fiche</button>
@@ -251,6 +270,12 @@ export class PersonnelComponent {
 
   activeTab = signal<Tab>('fiche');
 
+  fileCNI: File | null = null;
+  fileDiplome: File | null = null;
+
+  onCniSelected(e: Event) { this.fileCNI = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onDiplomeSelected(e: Event) { this.fileDiplome = (e.target as HTMLInputElement).files?.[0] ?? null; }
+
   tabs = [
     { id: 'fiche' as Tab,   label: 'Nouvelle fiche', icon: 'ti-user-plus' },
     { id: 'liste' as Tab,   label: 'Liste agents',   icon: 'ti-list'      },
@@ -304,13 +329,15 @@ export class PersonnelComponent {
       next: () => {
         this.toast.show('p', `Fiche agent créée — ${matricule} — ${nom} ${prenom}`);
         this.form = this.emptyForm();
+        this.fileCNI = null;
+        this.fileDiplome = null;
         this.activeTab.set('liste');
       },
       error: () => this.toast.show('p', 'Erreur lors de la création de l\'agent'),
     });
   }
 
-  resetFiche(): void { this.form = this.emptyForm(); }
+  resetFiche(): void { this.form = this.emptyForm(); this.fileCNI = null; this.fileDiplome = null; }
 
   initiales(nom: string): string {
     return nom.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
@@ -329,8 +356,9 @@ export class PersonnelComponent {
       matricule: '', nom: '', prenom: '', dateNaissance: '', genre: 'M',
       situationFamiliale: 'Célibataire', telephone: '', email: '',
       typeContrat: 'fonctionnaire', poste: '', direction: '', categorie: 'A',
-      specialite: '',  // ← Ajoutez cette ligne
+      specialite: '',
       grade: '', dateEmbauche: '', salaireBrut: null as number | null, diplome: 'Licence',
+      numeroCNI: '',
     };
   }
 }

@@ -35,12 +35,12 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
       </div>
     </div>
     <div class="tf">
-      <input type="text" [(ngModel)]="filtre.search" placeholder="Rechercher désignation, référence..." (ngModelChange)="onFiltre()">
-      <select [(ngModel)]="filtre.categorie" (ngModelChange)="onFiltre()">
+      <input type="text" [ngModel]="filtreSearch()" (ngModelChange)="filtreSearch.set($event)" placeholder="Rechercher désignation, référence...">
+      <select [ngModel]="filtreCategorie()" (ngModelChange)="filtreCategorie.set($event)">
         <option value="">Toutes catégories</option>
         @for (c of categories; track c.v) { <option [value]="c.v">{{ c.l }}</option> }
       </select>
-      <select [(ngModel)]="filtre.statut" (ngModelChange)="onFiltre()">
+      <select [ngModel]="filtreStatut()" (ngModelChange)="filtreStatut.set($event)">
         <option value="">Tous statuts</option>
         <option value="occupe">Occupé</option><option value="disponible">Disponible</option>
         <option value="loue">Loué</option><option value="en_maintenance">Maintenance</option>
@@ -305,8 +305,11 @@ export class InventaireComponent implements OnInit {
   readonly pat   = inject(PatrimoineService);
   readonly toast = inject(ToastService);
 
-  activeTab = signal<Tab>('tous');
-  saving    = signal(false);
+  activeTab       = signal<Tab>('tous');
+  saving          = signal(false);
+  filtreSearch    = signal('');
+  filtreCategorie = signal('');
+  filtreStatut    = signal('');
 
   tabs = [
     { id: 'tous'         as Tab, label: 'Tous les biens', icon: 'ti-list'          },
@@ -325,69 +328,85 @@ export class InventaireComponent implements OnInit {
 
   typesInfo = ['Ordinateur de bureau','Ordinateur portable','Imprimante','Serveur','Tablette','Vidéoprojecteur','Écran','Scanner'];
 
-  filtre = { search: '', categorie: '', statut: '' };
   mob    = { designation: '', quantite: null as number|null, valeurUnitaire: null as number|null, localisation: '', dateAcquisition: '', etat: 'bon' };
   inf    = { type: '', modele: '', serie: '', affectation: '', valeur: null as number|null, dateAcquisition: '' };
   veh    = { modele: '', immatriculation: '', kilometrage: null as number|null, affectation: '', valeur: null as number|null, finAssurance: '', finVT: '' };
   eqp    = { designation: '', marque: '', serie: '', localisation: '', valeur: null as number|null, dateAcquisition: '' };
   nv     = { categorie: '', designation: '', localisation: '', valeur: null as number|null, dateAcquisition: '', affectation: '', tauxAmort: null as number|null };
 
-  biensFiltres = computed(() => this.pat.filtrerBiens(this.filtre.search, this.filtre.categorie, this.filtre.statut));
+  biensFiltres = computed(() => this.pat.filtrerBiens(this.filtreSearch(), this.filtreCategorie(), this.filtreStatut()));
   totalValeur  = computed(() => this.biensFiltres().reduce((s, b) => s + b.valeurActuelle, 0));
 
   ngOnInit(): void { this.pat.loadBiens(); this.pat.loadVehicules(); }
 
   navigate(tab: Tab): void {
     this.activeTab.set(tab);
-    if (tab !== 'tous') this.pat.loadBiens({ categorie: tab === 'mobilier' || tab === 'informatique' || tab === 'vehicule' || tab === 'equipement' ? tab : undefined });
+    if (tab === 'vehicule') { this.pat.loadVehicules(); return; }
+    // Pour "tous" ou les sous-catégories on recharge les biens sans filtre ou avec filtre
+    const cat = (tab === 'mobilier' || tab === 'informatique' || tab === 'equipement') ? tab : undefined;
+    this.pat.loadBiens(cat ? { categorie: cat } : {});
   }
 
-  onFiltre(): void {}  // computed reactive — rien à faire
+
+  private errMsg(err: any): string {
+    return err?.error?.message ?? (err?.error?.errors ? (Object.values(err.error.errors) as string[][]).flat().join(' — ') : 'Erreur serveur');
+  }
 
   enregMobilier(): void {
-    if (!this.mob.designation || !this.mob.localisation) { this.toast.show('mob', 'Désignation et localisation obligatoires'); return; }
+    if (!this.mob.designation || !this.mob.localisation) { this.toast.showError('Champs manquants', 'Désignation et localisation obligatoires'); return; }
     this.saving.set(true);
     this.pat['mobApi'].create({ designation: this.mob.designation, quantite: this.mob.quantite ?? undefined, valeur_unitaire: this.mob.valeurUnitaire ?? undefined, localisation: this.mob.localisation, date_acquisition: this.mob.dateAcquisition || undefined, etat: this.mob.etat }).subscribe({
       next: () => { this.toast.show('mob', `Mobilier enregistré — ${this.mob.designation}`); this.saving.set(false); this.mob = { designation: '', quantite: null, valeurUnitaire: null, localisation: '', dateAcquisition: '', etat: 'bon' }; },
-      error: () => this.saving.set(false),
+      error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
   }
 
   enregInformatique(): void {
-    if (!this.inf.type || !this.inf.affectation) { this.toast.show('inf', 'Type et affectation obligatoires'); return; }
+    if (!this.inf.type || !this.inf.affectation) { this.toast.showError('Champs manquants', 'Type et affectation obligatoires'); return; }
     this.saving.set(true);
     this.pat['infApi'].create({ type_materiel: this.inf.type, modele: this.inf.modele, numero_serie: this.inf.serie, affectation: this.inf.affectation, valeur: this.inf.valeur ?? undefined, date_acquisition: this.inf.dateAcquisition || undefined }).subscribe({
       next: () => { this.toast.show('inf', `Matériel enregistré — ${this.inf.type} → ${this.inf.affectation}`); this.saving.set(false); this.inf = { type: '', modele: '', serie: '', affectation: '', valeur: null, dateAcquisition: '' }; },
-      error: () => this.saving.set(false),
+      error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
   }
 
   enregVehicule(): void {
-    if (!this.veh.modele || !this.veh.immatriculation || !this.veh.affectation) { this.toast.show('veh', 'Modèle, immatriculation et affectation obligatoires'); return; }
+    if (!this.veh.modele || !this.veh.immatriculation || !this.veh.affectation) { this.toast.showError('Champs manquants', 'Modèle, immatriculation et affectation obligatoires'); return; }
     this.saving.set(true);
     this.pat.enregistrerVehicule({ modele: this.veh.modele, immatriculation: this.veh.immatriculation, kilometrage: this.veh.kilometrage ?? undefined, affectation: this.veh.affectation, valeur: this.veh.valeur ?? undefined, finAssurance: this.veh.finAssurance || undefined, finVisiteTechnique: this.veh.finVT || undefined }).subscribe({
-      next: v => { this.toast.show('veh', `Véhicule enregistré — ${v.modele} — ${this.veh.immatriculation}`); this.saving.set(false); this.veh = { modele: '', immatriculation: '', kilometrage: null, affectation: '', valeur: null, finAssurance: '', finVT: '' }; },
-      error: () => this.saving.set(false),
+      next: v => {
+        this.toast.show('veh', `Véhicule enregistré — ${v.modele} — ${v.immatriculation}`);
+        this.saving.set(false);
+        this.veh = { modele: '', immatriculation: '', kilometrage: null, affectation: '', valeur: null, finAssurance: '', finVT: '' };
+        this.pat.loadVehicules();
+      },
+      error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
   }
 
   enregEquipement(): void {
-    if (!this.eqp.designation || !this.eqp.localisation) { this.toast.show('eqp', 'Désignation et localisation obligatoires'); return; }
+    if (!this.eqp.designation || !this.eqp.localisation) { this.toast.showError('Champs manquants', 'Désignation et localisation obligatoires'); return; }
     this.saving.set(true);
     this.pat['eqpApi'].create({ designation: this.eqp.designation, marque: this.eqp.marque, numero_serie: this.eqp.serie, localisation: this.eqp.localisation, valeur: this.eqp.valeur ?? undefined, date_acquisition: this.eqp.dateAcquisition || undefined }).subscribe({
       next: () => { this.toast.show('eqp', `Équipement enregistré — ${this.eqp.designation}`); this.saving.set(false); this.eqp = { designation: '', marque: '', serie: '', localisation: '', valeur: null, dateAcquisition: '' }; },
-      error: () => this.saving.set(false),
+      error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
   }
 
   enregistrerBien(): void {
     if (!this.nv.categorie || !this.nv.designation || !this.nv.localisation || !this.nv.valeur || !this.nv.dateAcquisition || !this.nv.affectation) {
-      this.toast.show('nv', 'Veuillez remplir tous les champs obligatoires'); return;
+      this.toast.showError('Champs manquants', 'Veuillez remplir tous les champs obligatoires'); return;
     }
     this.saving.set(true);
     this.pat.enregistrerBien({ categorie: this.nv.categorie, designation: this.nv.designation, localisation: this.nv.localisation, valeurAcquisition: this.nv.valeur!, dateAcquisition: this.nv.dateAcquisition, affectation: this.nv.affectation, tauxAmortissement: this.nv.tauxAmort ?? undefined }).subscribe({
-      next: b => { this.toast.show('nv', `Bien enregistré — ${b.reference} — QR: ${b.qrCode ?? 'généré'}`); this.saving.set(false); this.resetNouveauBien(); this.activeTab.set('tous'); },
-      error: () => this.saving.set(false),
+      next: b => {
+        this.toast.show('nv', `Bien enregistré — ${b.reference}`);
+        this.saving.set(false);
+        this.resetNouveauBien();
+        this.pat.loadBiens({});
+        this.activeTab.set('tous');
+      },
+      error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
   }
 

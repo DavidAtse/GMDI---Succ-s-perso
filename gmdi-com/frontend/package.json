@@ -5,8 +5,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "build:prod": "ng build --configuration production"
+    "build": "ng build --base-href /gmdi/com/",
+    "build:prod": "ng build --configuration production --base-href /gmdi/com/"
   },
   "dependencies": {
     "@angular/animations": "^21.0.0",

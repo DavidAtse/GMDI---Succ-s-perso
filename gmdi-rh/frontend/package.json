@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --base-href /gmdi/rh/",
     "build:prod": "ng build --configuration production"
   },
   "private": true,

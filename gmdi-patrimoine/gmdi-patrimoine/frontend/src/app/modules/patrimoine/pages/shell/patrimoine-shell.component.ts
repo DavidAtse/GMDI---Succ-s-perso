@@ -80,11 +80,11 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
         </div>
         <div class="phdr-kpis">
           <div class="phdr-kpi">
-            <span class="phdr-kv" style="color:#003366">{{ pat.kpi().totalBiens }}</span>
+            <span class="phdr-kv" style="color:#F77F00">{{ pat.kpi().totalBiens }}</span>
             <span class="phdr-kl">BIENS TOTAL</span>
           </div>
           <div class="phdr-kpi">
-            <span class="phdr-kv" style="color:#003366">{{ pat.vehicules().length }}</span>
+            <span class="phdr-kv" style="color:#004D20">{{ pat.vehicules().length }}</span>
             <span class="phdr-kl">VÉHICULES</span>
           </div>
           <div class="phdr-kpi">
@@ -107,6 +107,19 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       @if (activeSection() === 'rapports')      { <app-rapports-patrimoine />     }
     </div>
   </div>
+</div>
+
+<!-- Toast globaux flottants -->
+<div class="toast-stack">
+  @for (t of visibleToasts(); track t.id) {
+    <div class="toast-global" [class.ok]="t.type === 'success'">
+      <i class="ti" [class.ti-circle-check]="t.type === 'success'" [class.ti-alert-circle]="t.type === 'error'" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
+      <div>
+        @if (t.title) { <div class="tg-title">{{ t.title }}</div> }
+        <div class="tg-msg">{{ t.message }}</div>
+      </div>
+    </div>
+  }
 </div>
   `,
   styles: [`
@@ -131,10 +144,11 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     }
     .btn-logout i { font-size: 14px; }
 
-    /* ── Header patrimoine (style photo RH) ── */
+    /* ── Header patrimoine ── */
     .phdr {
       background: #fff;
       border: 1px solid #e5e7eb;
+      border-top: 3px solid #F77F00;
       border-radius: 10px;
       padding: .85rem 1.2rem;
       display: flex;
@@ -145,10 +159,11 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     }
     .phdr-left { display: flex; align-items: center; gap: .75rem; }
     .phdr-icon {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: #fff5eb; border: 1.5px solid #F77F00;
+      width: 46px; height: 46px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(247,127,0,.12), rgba(0,154,68,.08));
+      border: 2px solid #F77F00;
       display: flex; align-items: center; justify-content: center;
-      color: #F77F00; font-size: 20px;
+      color: #F77F00; font-size: 22px;
     }
     .phdr-title { font-size: 15px; font-weight: 600; color: #111827; }
     .phdr-sub   { font-size: 11px; color: #6b7280; margin-top: 1px; }
@@ -162,8 +177,11 @@ export class PatrimoineShellComponent implements OnInit {
   readonly pat     = inject(PatrimoineService);
   readonly loading = inject(LoadingService);
   readonly auth    = inject(AuthService);
+  readonly toast   = inject(ToastService);
 
   activeSection = signal<Section>('inventaire');
+
+  visibleToasts = computed(() => Object.values(this.toast.toasts()).filter(t => t.visible));
 
   readonly userInitials = computed(() => {
     const name = this.auth.currentUser()?.name ?? '';
