@@ -1,1 +1,0 @@
-import{C as i,ka as n,q as e}from"./chunk-LKAPWFVX.js";var a=class o{constructor(){this._count=i(0);this.isLoading=n(()=>this._count()>0)}increment(){this._count.update(t=>t+1)}decrement(){this._count.update(t=>Math.max(0,t-1))}static{this.\u0275fac=function(c){return new(c||o)}}static{this.\u0275prov=e({token:o,factory:o.\u0275fac,providedIn:"root"})}};export{a};
